@@ -42,13 +42,19 @@ async function sendMessage() {
         // Remove loading
         removeLoadingMessage(loadingElement);
         
-        // Adiciona resposta do bot
-        addMessage(data.response, 'bot');
+        // Adiciona resposta do bot com informações completas
+        addBotMessage(data);
         
     } catch (error) {
         console.error('Erro:', error);
         removeLoadingMessage(loadingElement);
-        addMessage('🤔 Desculpe, ocorreu um erro. Tente novamente em instantes.', 'bot');
+        const errorData = {
+            response: '🤔 Desculpe, ocorreu um erro. Tente novamente em instantes.',
+            intent: 'error',
+            confidence: 0.0,
+            is_multiple: false
+        };
+        addBotMessage(errorData);
     } finally {
         isLoading = false;
     }
@@ -60,7 +66,7 @@ function sendSuggestion(text) {
     sendMessage();
 }
 
-// Função para adicionar mensagem ao chat
+// Função para adicionar mensagem do usuário ao chat
 function addMessage(text, sender) {
     const messagesContainer = document.getElementById('chat-messages');
     
@@ -84,6 +90,112 @@ function addMessage(text, sender) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
     return messageElement;
+}
+
+// Função para adicionar mensagem completa do bot
+function addBotMessage(data) {
+    const messagesContainer = document.getElementById('chat-messages');
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message bot-message enhanced-bot-message';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = '🤖';
+    
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    
+    // Resposta principal
+    const responseText = document.createElement('p');
+    responseText.className = 'bot-response-text';
+    responseText.textContent = data.response;
+    content.appendChild(responseText);
+    
+    // Informações técnicas em container separado
+    const infoContainer = document.createElement('div');
+    infoContainer.className = 'bot-info-container';
+    
+    // Intenção detectada
+    const intentInfo = document.createElement('div');
+    intentInfo.className = 'bot-info-item';
+    intentInfo.innerHTML = `
+        <span class="info-label">🎯 Intenção:</span> 
+        <span class="info-value intent-value">${formatIntent(data.intent)}</span>
+    `;
+    infoContainer.appendChild(intentInfo);
+    
+    // Confiança/Probabilidade
+    const confidenceInfo = document.createElement('div');
+    confidenceInfo.className = 'bot-info-item';
+    const confidencePercent = Math.round(data.confidence * 100);
+    const confidenceClass = getConfidenceClass(data.confidence);
+    confidenceInfo.innerHTML = `
+        <span class="info-label">📊 Confiança:</span> 
+        <span class="info-value confidence-value ${confidenceClass}">${confidencePercent}%</span>
+    `;
+    infoContainer.appendChild(confidenceInfo);
+    
+    // Informações adicionais se múltiplas sentenças
+    if (data.is_multiple && data.sentence_count > 1) {
+        const sentencesInfo = document.createElement('div');
+        sentencesInfo.className = 'bot-info-item';
+        sentencesInfo.innerHTML = `
+            <span class="info-label">📝 Sentenças:</span> 
+            <span class="info-value">${data.sentence_count} detectadas</span>
+        `;
+        infoContainer.appendChild(sentencesInfo);
+        
+        // Mostrar intenções detectadas se houver múltiplas
+        if (data.detected_intents && data.detected_intents.length > 0) {
+            const detectedInfo = document.createElement('div');
+            detectedInfo.className = 'bot-info-item';
+            detectedInfo.innerHTML = `
+                <span class="info-label">🔍 Detectadas:</span> 
+                <span class="info-value">${data.detected_intents.map(formatIntent).join(', ')}</span>
+            `;
+            infoContainer.appendChild(detectedInfo);
+        }
+    }
+    
+    content.appendChild(infoContainer);
+    
+    messageElement.appendChild(avatar);
+    messageElement.appendChild(content);
+    
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    return messageElement;
+}
+
+// Função para formatar nomes de intenções
+function formatIntent(intent) {
+    const intentMap = {
+        'greeting': 'Saudação',
+        'goodbye': 'Despedida', 
+        'thanks': 'Agradecimento',
+        'menu': 'Cardápio',
+        'hours': 'Horário',
+        'payment': 'Pagamento',
+        'delivery': 'Entrega',
+        'prices': 'Preços',
+        'orders': 'Pedidos',
+        'location': 'Localização',
+        'about': 'Sobre',
+        'contact': 'Contato',
+        'fallback': 'Não identificada',
+        'error': 'Erro'
+    };
+    
+    return intentMap[intent] || intent;
+}
+
+// Função para determinar classe CSS baseada na confiança
+function getConfidenceClass(confidence) {
+    if (confidence >= 0.8) return 'confidence-high';
+    if (confidence >= 0.5) return 'confidence-medium';
+    return 'confidence-low';
 }
 
 // Função para adicionar loading
@@ -252,7 +364,13 @@ document.addEventListener('keydown', function(e) {
             document.body.style.animation = '';
         }, 6000);
         
-        addMessage('🎉 Você encontrou o código secreto! Parabéns! 🍰', 'bot');
+        const easterEggData = {
+            response: '🎉 Você encontrou o código secreto! Parabéns! 🍰',
+            intent: 'easter_egg',
+            confidence: 1.0,
+            is_multiple: false
+        };
+        addBotMessage(easterEggData);
     }
 });
 

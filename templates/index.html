@@ -106,6 +106,7 @@
         <div class="container">
             <h2 class="section-title">Converse Conosco!</h2>
             <p class="section-subtitle">Tire suas dúvidas, faça pedidos ou saiba mais sobre nossos produtos</p>
+            <p class="chatbot-info">🤖 Nosso assistente inteligente mostra a confiança das respostas e intenções detectadas</p>
             
             <div class="chat-container">
                 <div class="chat-header">
@@ -117,10 +118,20 @@
                 </div>
                 
                 <div id="chat-messages" class="chat-messages">
-                    <div class="message bot-message">
+                    <div class="message bot-message enhanced-bot-message">
                         <div class="message-avatar">🤖</div>
                         <div class="message-content">
-                            <p>🍰 Olá! Bem-vindo à Doce Encanto! Em que posso ajudar você hoje?</p>
+                            <p class="bot-response-text">🍰 Olá! Bem-vindo à Doce Encanto! Em que posso ajudar você hoje?</p>
+                            <div class="bot-info-container">
+                                <div class="bot-info-item">
+                                    <span class="info-label">🎯 Intenção:</span> 
+                                    <span class="info-value intent-value">Saudação</span>
+                                </div>
+                                <div class="bot-info-item">
+                                    <span class="info-label">📊 Confiança:</span> 
+                                    <span class="info-value confidence-value confidence-high">100%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
